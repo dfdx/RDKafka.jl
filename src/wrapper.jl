@@ -1,9 +1,14 @@
-
+## wrapper for librdkafka C API, see:
+## https://github.com/edenhill/librdkafka/blob/master/src/rdkafka.h
 
 ## rd_kafka_conf_t
 
 function kafka_conf_new()
     return ccall((:rd_kafka_conf_new, LIBRDKAFKA), Ptr{Void}, ())
+end
+
+function kafka_conf_destroy(conf::Ptr{Void})
+    ccall((:rd_kafka_conf_destroy, LIBRDKAFKA), Void, (Ptr{Void},), conf)
 end
 
 
@@ -41,10 +46,20 @@ function kafka_new(conf::Ptr{Void}, kafka_type::Cint)
 end
 
 
+function kafka_destroy(rk::Ptr{Void})
+    ccall((:rd_kafka_destroy, LIBRDKAFKA), Void, (Ptr{Void},), rk)
+end
+
+
 ## rd_kafka_topic_conf_t
 
 function kafka_topic_conf_new()
     return ccall((:rd_kafka_topic_conf_new, LIBRDKAFKA), Ptr{Void}, ())
+end
+
+
+function kafka_topic_conf_destroy(conf::Ptr{Void})
+    ccall((:rd_kafka_topic_conf_destroy, LIBRDKAFKA), Void, (Ptr{Void},), conf)
 end
 
 
@@ -75,7 +90,18 @@ function kafka_topic_new(rk::Ptr{Void}, topic::String, topic_conf::Ptr{Void})
 end
 
 
+function kafka_topic_destroy(rkt::Ptr{Void})
+    ccall((:rd_kafka_topic_destroy, LIBRDKAFKA), Void, (Ptr{Void},), rkt)
+end
+
 ## TODO: rd_kafka_poll - should be called, but I'm not sure yet when
+
+function kafka_poll(rk::Ptr{Void}, timeout::Integer)
+    return ccall((:rd_kafka_poll, LIBRDKAFKA), Cint,
+                 (Ptr{Void}, Cint),
+                 rk, timeout)
+    
+end
 
 
 # int rd_kafka_produce(rd_kafka_topic_t *rkt, int32_t partition,
@@ -101,4 +127,78 @@ function produce(rkt::Ptr{Void}, partition::Integer,
     if errcode != 0
         error("Produce request failed with error code: $errcode")
     end
+end
+
+
+
+## topic list
+
+function kafka_topic_partition_list_new(sz::Integer=0)
+    rkparlist = ccall((:rd_kafka_topic_partition_list_new, LIBRDKAFKA), Ptr{Void},
+                       (Cint,), sz)
+    return rkparlist
+end
+
+
+function kafka_topic_partition_list_destroy(rkparlist::Ptr{Void})
+    ccall((:rd_kafka_topic_partition_list_destroy, LIBRDKAFKA), Void, (Ptr{Void},), rkparlist)
+end
+
+
+function kafka_topic_partition_list_add(rkparlist::Ptr{Void},
+                                        topic::String, partition::Integer)
+    ccall((:rd_kafka_topic_partition_list_add, LIBRDKAFKA), Ptr{Void},
+          (Ptr{Void}, Cstring, Int32,), rkparlist, topic, partition)
+end
+
+
+## partition assignment
+
+function kafka_assignment(rk::Ptr{Void}, rkparlist::Ptr{Void})
+    errcode = ccall((:rd_kafka_assignment, LIBRDKAFKA), Cint,
+                    (Ptr{Void}, Ptr{Void}), rk, rkparlist)
+    if errcode != 0
+        error("Assignment retrieval failed with error $errcode")
+    end
+end
+    
+
+## subscribe
+
+function kafka_subscribe(rk::Ptr{Void}, rkparlist::Ptr{Void})
+    errcode = ccall((:rd_kafka_subscribe, LIBRDKAFKA), Cint,
+                    (Ptr{Void}, Ptr{Void}), rk, rkparlist)
+    if errcode != 0
+        error("Subscription failed with error $errcode")
+    end
+end
+
+
+struct CKafkaMessage
+    err::Cint
+    rkt::Ptr{Void}
+    partition::Int32
+    payload::Ptr{UInt8}
+    len::Csize_t
+    key::Ptr{UInt8}
+    key_len::Csize_t
+    offset::Int64
+    _private::Ptr{Void}
+end
+
+
+function kafka_consumer_poll(rk::Ptr{Void}, timeout::Integer)
+    msg_ptr = ccall((:rd_kafka_consumer_poll, LIBRDKAFKA), Ptr{CKafkaMessage},
+                    (Ptr{Void}, Cint), rk, timeout)
+    if msg_ptr != Ptr{CKafkaMessage}(0)
+        return msg_ptr
+    else
+        return nothing
+    end
+        
+end
+
+
+function kafka_message_destroy(msg_ptr::Ptr{CKafkaMessage})
+    ccall((:rd_kafka_message_destroy, LIBRDKAFKA), Void, (Ptr{Void},), msg_ptr)
 end

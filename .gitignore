@@ -4,3 +4,4 @@
 *.so
 *~
 .juliahistory
+_*
