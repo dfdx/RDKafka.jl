@@ -3,7 +3,7 @@ module RDKafka
 export KafkaProducer,
     KafkaConsumer,
     KafkaClient,
-    produce,
+    # produce,
     subscribe,
     poll
 

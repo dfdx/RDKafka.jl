@@ -2,6 +2,7 @@
 *.jl.*.cov
 *.jl.mem
 *.so
+deps/librdkafka
 *~
 .juliahistory
 _*

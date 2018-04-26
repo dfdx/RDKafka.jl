@@ -112,7 +112,7 @@ end
 
 
 
-function produce(rkt::Ptr{Void}, partition::Integer,
+function Base.produce(rkt::Ptr{Void}, partition::Integer,
                  key::Vector{UInt8}, payload::Vector{UInt8})
     flags = Cint(0)
     errcode = ccall((:rd_kafka_produce, LIBRDKAFKA), Cint,

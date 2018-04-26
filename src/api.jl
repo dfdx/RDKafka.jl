@@ -81,12 +81,12 @@ function Base.show(io::IO, p::KafkaProducer)
 end
 
 
-function produce(kt::KafkaTopic, partition::Integer, key, payload)
+function Base.produce(kt::KafkaTopic, partition::Integer, key, payload)
     produce(kt.rkt, partition, convert(Vector{UInt8}, key), convert(Vector{UInt8}, payload))
 end
 
 
-function produce(p::KafkaProducer, topic::String, partition::Integer, key, payload)
+function Base.produce(p::KafkaProducer, topic::String, partition::Integer, key, payload)
     if !haskey(p.topics, topic)
         p.topics[topic] = KafkaTopic(p.client, topic, Dict())
     end
