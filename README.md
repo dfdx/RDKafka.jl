@@ -2,6 +2,17 @@
 
 Julia wrapper for [librdkafka](https://github.com/edenhill/librdkafka).
 
+## Build
+
+Currently this package builds only on Linux and requires `git` and `make` to
+be available in command line.
+
+```
+Pkg.clone("https://github.com/dfdx/RDKafka.jl")
+Pkg.build("RDKafka")
+```
+
+
 ## Usage
 
 
