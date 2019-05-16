@@ -123,13 +123,14 @@ function produce(rkt::Ptr{Cvoid}, partition::Integer,
                     rkt, Int32(partition), flags,
                     pointer(payload), length(payload),
                     pointer(key), length(key),
-                    C_NULL)
-    print("calling c produce: $errcode")
-   errno = unsafe_load(cglobal(:errno, Int32))
-   errmsg = unsafe_string(ccall(:strerror, Cstring, (Int32,), errno))
-  print(errmsg)
+                    C_NULL)   
+
     if errcode != 0
-        error("Produce request failed with error code: $errcode")
+        #error("Produce request failed with error code (unix): $errcode")
+        ## errno is c global var
+	errnr = unsafe_load(cglobal(:errno, Int32))
+        errmsg = unsafe_string(ccall(:strerror, Cstring, (Int32,), errnr))
+        error("Produce request failed with error code: $errmsg")  
     end
 end
 
