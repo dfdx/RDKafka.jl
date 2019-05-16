@@ -5,7 +5,7 @@
 mutable struct KafkaClient
     conf::Dict{Any, Any}
     typ::Cint
-    rk::Ptr{Void}
+    rk::Ptr{Cvoid}
 end
 
 
@@ -26,7 +26,7 @@ function KafkaClient(typ::Integer, conf::Dict=Dict())
     rk = kafka_new(c_conf, Cint(typ))
     client = KafkaClient(conf, typ, rk)
     # seems like `kafka_destroy` also destroys its config, so we don't attempt it twice
-    finalizer(client, client -> kafka_destroy(rk))
+    # finalizer(client, client -> kafka_destroy(rk))
     return client
 end
 
@@ -37,7 +37,7 @@ Base.show(io::IO, kc::KafkaClient) = print(io, "KafkaClient($(kc.typ))")
 mutable struct KafkaTopic
     conf::Dict{Any, Any}
     topic::String
-    rkt::Ptr{Void}
+    rkt::Ptr{Cvoid}
 end
 
 
@@ -48,7 +48,7 @@ function KafkaTopic(kc::KafkaClient, topic::String, conf::Dict=Dict())
     end
     rkt = kafka_topic_new(kc.rk, "mytopic", c_conf)
     topic = KafkaTopic(conf, topic, rkt)
-    finalizer(topic, topic -> (kafka_topic_destroy(rkt)))
+    # finalizer(topic, topic -> (kafka_topic_destroy(rkt)))
     return topic
 end
 
@@ -81,12 +81,13 @@ function Base.show(io::IO, p::KafkaProducer)
 end
 
 
-function Base.produce(kt::KafkaTopic, partition::Integer, key, payload)
-    produce(kt.rkt, partition, convert(Vector{UInt8}, key), convert(Vector{UInt8}, payload))
+function produce(kt::KafkaTopic, partition::Integer, key, payload)
+    #produce(kt.rkt, partition, convert(Vector{UInt8}, key), convert(Vector{UInt8}, payload))
+     produce(kt.rkt, partition, Vector{UInt8}(key), Vector{UInt8}(payload))
 end
 
 
-function Base.produce(p::KafkaProducer, topic::String, partition::Integer, key, payload)
+function produce(p::KafkaProducer, topic::String, partition::Integer, key, payload)
     if !haskey(p.topics, topic)
         p.topics[topic] = KafkaTopic(p.client, topic, Dict())
     end
@@ -100,8 +101,8 @@ struct Message{K,P}
     err::Int
     topic::KafkaTopic
     partition::Int32
-    key::Union{K, Void}
-    payload::Union{P, Void}
+    key::Union{K, Cvoid}
+    payload::Union{P, Cvoid}
     offset::Int64
 end
 
@@ -121,13 +122,13 @@ Base.show(io::IO, msg::Message) = print(io, "Message($(msg.key): $(msg.payload))
 
 
 mutable struct PartitionList
-    rkparlist::Ptr{Void}
+    rkparlist::Ptr{Cvoid}
 end
 
 function PartitionList()
     ptr = kafka_topic_partition_list_new()
     parlist = PartitionList(ptr)
-    finalizer(parlist, parlist -> kafka_topic_partition_list_destroy(ptr))
+    # finalizer(parlist, parlist -> kafka_topic_partition_list_destroy(ptr))
     return parlist
 end
 

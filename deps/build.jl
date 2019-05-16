@@ -7,13 +7,13 @@ const LIBRDKAFKA_REPO = "https://github.com/edenhill/librdkafka/"
 
 # linux-only
 cd(@__DIR__) do
-    rm("librdkafka"; recursive=true, force=true)
+    rm("librdkafka"; recursive=true)
     run(`git clone --depth 1 -b master $LIBRDKAFKA_REPO librdkafka`)
     cd("librdkafka") do
         run(`./configure`)
         run(`make`)        
     end
-    cp("librdkafka/src/librdkafka.so.1", "librdkafka.so"; remove_destination=true)
+    cp("librdkafka/src/librdkafka.so.1", "librdkafka.so"; force=true )
 end
 
 
