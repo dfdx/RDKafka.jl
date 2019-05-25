@@ -1,8 +1,8 @@
 name = "RDKafka"
-uuid = "0e8a1bee-d598-5f80-966e-d370cfcf65f3"
+uuid = "43e2f499-f4c7-585f-8317-cbc2d9c3bf8f"
 
 [deps]
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [compat]
-julia = "≥ 0.6.0"
+julia = "≥ 0.7.0"
