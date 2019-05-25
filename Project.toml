@@ -1,0 +1,9 @@
+name = "RDKafka"
+uuid = "43e2f499-f4c7-585f-8317-cbc2d9c3bf8f"
+
+[deps]
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+
+[compat]
+julia = "≥ 0.7.0"
