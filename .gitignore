@@ -6,3 +6,4 @@ deps/librdkafka
 *~
 .juliahistory
 _*
+build.log
