@@ -94,7 +94,6 @@ function kafka_topic_destroy(rkt::Ptr{Cvoid})
     ccall((:rd_kafka_topic_destroy, LIBRDKAFKA), Cvoid, (Ptr{Cvoid},), rkt)
 end
 
-## TODO: rd_kafka_poll - should be called, but I'm not sure yet when
 
 function kafka_poll(rk::Ptr{Cvoid}, timeout::Integer)
     return ccall((:rd_kafka_poll, LIBRDKAFKA), Cint,

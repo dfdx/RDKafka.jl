@@ -19,6 +19,7 @@ end
 
 
 function KafkaClient(typ::Integer, conf::Dict=Dict())
+    # TODO: add options for callbacks, creata a task calling kafka_poll(rk, timeout) every 1 second
     c_conf = kafka_conf_new()
     for (k, v) in conf
         kafka_conf_set(c_conf, string(k), string(v))
@@ -26,7 +27,7 @@ function KafkaClient(typ::Integer, conf::Dict=Dict())
     rk = kafka_new(c_conf, Cint(typ))
     client = KafkaClient(conf, typ, rk)
     # seems like `kafka_destroy` also destroys its config, so we don't attempt it twice
-    # finalizer(client, client -> kafka_destroy(rk))
+    finalizer(client -> kafka_destroy(rk), client)    
     return client
 end
 
@@ -46,9 +47,9 @@ function KafkaTopic(kc::KafkaClient, topic::String, conf::Dict=Dict())
     for (k, v) in conf
         kafka_topic_conf_set(c_conf, string(k), string(v))
     end
-    rkt = kafka_topic_new(kc.rk, "mytopic", c_conf)
+    rkt = kafka_topic_new(kc.rk, topic, c_conf)
     topic = KafkaTopic(conf, topic, rkt)
-    # finalizer(topic, topic -> (kafka_topic_destroy(rkt)))
+    finalizer(topic -> (kafka_topic_destroy(rkt)), topic)
     return topic
 end
 
@@ -107,6 +108,9 @@ struct Message{K,P}
 end
 
 
+Base.convert(::Type{String}, data::Vector{UInt8}) = String(data)
+
+
 function Message{K,P}(c_msg::CKafkaMessage) where {K,P}
     topic = KafkaTopic(Dict(), "<unkown>", c_msg.rkt)
     if c_msg.err == 0
@@ -128,7 +132,7 @@ end
 function PartitionList()
     ptr = kafka_topic_partition_list_new()
     parlist = PartitionList(ptr)
-    # finalizer(parlist, parlist -> kafka_topic_partition_list_destroy(ptr))
+    finalizer(parlist -> kafka_topic_partition_list_destroy(ptr), parlist)
     return parlist
 end
 
