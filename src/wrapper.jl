@@ -30,6 +30,17 @@ function kafka_conf_get(conf::Ptr{Cvoid}, key::String)
 end
 
 
+function kafka_conf_set_error_cb(conf::Ptr{Cvoid}, c_fn::Ptr{Cvoid})
+    ccall((:rd_kafka_conf_set_error_cb, LIBRDKAFKA), Cvoid,
+          (Ptr{Cvoid}, Ptr{Cvoid}), conf, c_fn)
+end
+
+function kafka_conf_set_dr_msg_cb(conf::Ptr{Cvoid}, c_fn::Ptr{Cvoid})
+    ccall((:rd_kafka_conf_set_dr_msg_cb, LIBRDKAFKA), Cvoid,
+          (Ptr{Cvoid}, Ptr{Cvoid}), conf, c_fn)
+end
+
+
 ## rd_kafka_t
 
 const KAFKA_TYPE_PRODUCER = Cint(0)
@@ -101,14 +112,6 @@ function kafka_poll(rk::Ptr{Cvoid}, timeout::Integer)
                  rk, timeout)
     
 end
-
-
-# int rd_kafka_produce(rd_kafka_topic_t *rkt, int32_t partition,
-# 		      int msgflags,
-# 		      void *payload, size_t len,
-# 		      const void *key, size_t keylen,
-# 		      void *msg_opaque);
-
 
 
 function produce(rkt::Ptr{Cvoid}, partition::Integer,
