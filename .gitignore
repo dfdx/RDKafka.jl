@@ -1,9 +1,16 @@
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
+
+# build
 *.so
-deps/librdkafka
+deps/usr
+build.log
+*.zip
+
+# editor files, history
 *~
 .juliahistory
+
+# intensionally invisible files
 _*
-build.log
