@@ -1,5 +1,7 @@
 # RDKafka
 
+[![Build Status](https://travis-ci.org/dfdx/RDKafka.jl.svg?branch=master)](https://travis-ci.org/dfdx/RDKafka.jl)
+
 Julia wrapper for [librdkafka](https://github.com/edenhill/librdkafka).
 
 ## Build
