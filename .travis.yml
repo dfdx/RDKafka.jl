@@ -7,14 +7,16 @@ julia:
 matrix:
   allow_failures:
     - julia: nightly
+      
 notifications:
     email: false
 
 services:
   - docker
 
-before_install:
+before_script:
   - docker-compose up -d
+  - echo exit | telnet localhost 19092
     
 after_success:
     # push coverage results to Codecov
