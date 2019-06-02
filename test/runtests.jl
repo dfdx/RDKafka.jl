@@ -16,13 +16,13 @@ end
 end
 
 
-# @testset "consumer smoke" begin
-#     c = KafkaConsumer("localhost:19092", "my-consumer-group")
-#     parlist = [("test", 0)]
-#     subscribe(c, parlist)
-#     timeout_ms = 1000
-#     for i=1:20
-#         msg = poll(String, String, c, timeout_ms)
-#         @show msg
-#     end
-# end
+@testset "consumer smoke" begin
+    c = KafkaConsumer("localhost:19092", "my-consumer-group")
+    parlist = [("test", 0)]
+    subscribe(c, parlist)
+    timeout_ms = 1000
+    for i=1:20
+        msg = poll(String, String, c, timeout_ms)
+        @show msg
+    end
+end
