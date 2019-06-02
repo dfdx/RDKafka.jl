@@ -1,9 +1,9 @@
 using RDKafka
 using Test
 
-@testset "dummy" begin
-    @test 1 == 1
-end
+# @testset "dummy" begin
+#     @test 1 == 1
+# end
 
 @testset "producer smoke" begin
     p = KafkaProducer(
