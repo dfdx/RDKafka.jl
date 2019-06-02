@@ -16,7 +16,8 @@ services:
 
 before_script:
   - docker-compose up -d
-  - bash -c "echo exit | telnet localhost 19092"
+  # - sleep 30
+  - bash -c "echo exit | telnet localhost 19092 || true"
     
 after_success:
     # push coverage results to Codecov
