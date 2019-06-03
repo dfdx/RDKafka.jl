@@ -15,9 +15,7 @@ services:
   - docker
 
 before_script:
-  - docker-compose up -d
-  # - sleep 30
-  - bash -c "echo exit | telnet localhost 19092 || true"
+  - julia deps/run_kafka.jl &
     
 after_success:
     # push coverage results to Codecov
