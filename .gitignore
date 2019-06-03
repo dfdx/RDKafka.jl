@@ -5,6 +5,7 @@
 # build
 *.so
 deps/usr
+deps/kafka
 build.log
 *.zip
 
