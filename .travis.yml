@@ -16,6 +16,7 @@ services:
 
 before_script:
   - julia deps/run_kafka.jl &
+  - sleep 20
     
 after_success:
     # push coverage results to Codecov

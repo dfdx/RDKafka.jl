@@ -33,12 +33,14 @@ end
 
 
 @testset "produce-consume" begin
+    @show RDKafka.LIBRDKAFKA
     p = KafkaProducer(
         BOOTSTRAP_SERVER,
         Dict("request.required.acks" => "all");
         dr_cb = (msg -> println("err = $(msg.err)"))) 
     produce(p, "test", 0, "key1", "payload1")
     produce(p, "test", "key2", "payload2")
+    println("~~~~~~~~ produced")
 
     c = KafkaConsumer(BOOTSTRAP_SERVER, "my-consumer-group")
     parlist = [("test", 0)]
