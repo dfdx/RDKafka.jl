@@ -11,12 +11,13 @@ matrix:
 notifications:
     email: false
 
-services:
-  - docker
+# services:
+#   - docker
 
 before_script:
   - julia deps/run_kafka.jl &
   - sleep 20
+  - tree deps
     
 after_success:
     # push coverage results to Codecov
