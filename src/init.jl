@@ -10,6 +10,9 @@ end
 
 
 function find_librdkafka(dep_dir)
+    for fname in readdir(DEP_DIR)
+        println(fname)
+    end
     base = "librdkafka"
     for fname in [
         "$base.$dlext",
