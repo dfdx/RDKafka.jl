@@ -17,7 +17,8 @@ notifications:
 before_script:
   - julia deps/run_kafka.jl &
   - sleep 20
-  - tree deps
+  - ls deps
+  - ls deps/usr
     
 after_success:
     # push coverage results to Codecov
