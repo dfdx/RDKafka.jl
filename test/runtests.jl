@@ -9,45 +9,25 @@ const BOOTSTRAP_SERVER = "localhost:9092"
     @test 1 == 1
 end
 
-# @testset "producer smoke" begin
-#     p = KafkaProducer(
-#         BOOTSTRAP_SERVER,
-#         Dict("request.required.acks" => "all");
-#         dr_cb = (msg -> println("err = $(msg.err)")))
-#     println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-#     produce(p, "test", 0, "message key", "message payload")
-#     produce(p, "test", "message key", "message payload")
-# end
-
-
-# @testset "consumer smoke" begin
-#     c = KafkaConsumer(BOOTSTRAP_SERVER, "my-consumer-group")
-#     parlist = [("test", 0)]
-#     subscribe(c, parlist)
-#     timeout_ms = 1000
-#     for i=1:20
-#         msg = poll(String, String, c, timeout_ms)
-#         @show msg
-#     end
-# end
-
 
 @testset "produce-consume" begin
-    @show RDKafka.LIBRDKAFKA
     p = KafkaProducer(
         BOOTSTRAP_SERVER,
         Dict("request.required.acks" => "all");
-        dr_cb = (msg -> println("err = $(msg.err)"))) 
+        dr_cb = (msg -> println("err = $(msg.err)")))
     produce(p, "test", 0, "key1", "payload1")
     produce(p, "test", "key2", "payload2")
-    println("~~~~~~~~ produced")
 
-    c = KafkaConsumer(BOOTSTRAP_SERVER, "my-consumer-group")
+    c = KafkaConsumer(BOOTSTRAP_SERVER, "my-consumer-group", Dict("auto.offset.reset" => "earliest"))
     parlist = [("test", 0)]
     subscribe(c, parlist)
     timeout_ms = 1000
+    messages = []
     for i=1:20
         msg = poll(String, String, c, timeout_ms)
-        @show msg
+        push!(messages, msg)
     end
+    println(messages)
+    @test findfirst(msg -> msg != nothing && msg.key == "key1", messages) != nothing
+    @test findfirst(msg -> msg != nothing && msg.key == "key2", messages) != nothing
 end
