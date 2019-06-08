@@ -18,7 +18,7 @@ Pkg.build("RDKafka")
 ## Usage
 
 
-Producer:
+Producer :
 
 ```
 p = KafkaProducer("localhost:9092")
