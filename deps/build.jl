@@ -1,5 +1,7 @@
 using BinaryProvider # requires BinaryProvider 0.3.0 or later
 
+println("************* start building ****************")
+
 # Parse some basic command-line arguments
 const verbose = "--verbose" in ARGS
 const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__DIR__, "usr")))
@@ -43,48 +45,4 @@ end
 # Write out a deps.jl file that will contain mappings for our products
 # write_deps_file(joinpath(@__DIR__, "deps.jl"), products, verbose=verbose)
 
-
-
-# # using ZipFile
-
-# # const LIBRDKAFKA_REPO = "https://github.com/edenhill/librdkafka/"
-# const RELEASE_URL = "https://github.com/edenhill/librdkafka/archive/v1.0.0.zip"
-# const ZIP_FILE = "librdkafka.zip"
-# const SRC_DIR = "librdkafka"
-
-# # skipdir(path) = joinpath(splitpath(path)[2:end]...)
-
-# # function unzip_dir(zipfile, topdir)
-# #     reader = ZipFile.Reader(ZIP_FILE)
-# #     for f in reader.files
-# #         parts = splitpath(f.name)
-# #         length(parts) == 1 && continue
-# #         parts[1] = topdir  # replace topdir in archive with the provided topdir
-# #         path = joinpath(parts...)
-
-# #         mkpath(dirname(path))
-# #         open(path, "w") do out
-# #             data = read(f)
-# #             write(out, data)
-# #         end
-# #     end
-# #     close(reader)
-# # end
-
-
-# # Linux only
-# cd(@__DIR__) do
-#     # clean up first
-#     rm(ZIP_FILE; force=true, recursive=true)
-#     rm(SRC_DIR; force=true, recursive=true)
-#     # download and unpack ZIP file with library release
-#     download(RELEASE_URL, ZIP_FILE)
-#     run(`unzip $ZIP_FILE`)
-#     mv("librdkafka-1.0.0", SRC_DIR)
-#     # build the binary
-#     cd(SRC_DIR) do
-#         run(`./configure`)
-#         run(`make`)
-#     end
-#     cp("$SRC_DIR/src/librdkafka.so.1", "librdkafka.so"; force=true)
-# end
+println("************* done building ****************")
