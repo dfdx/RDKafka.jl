@@ -10,6 +10,7 @@ end
 
 
 function find_librdkafka(dep_dir)
+    println("-------------------")
     for fname in readdir(DEP_DIR)
         println(fname)
     end
