@@ -7,7 +7,8 @@ Julia wrapper for [librdkafka](https://github.com/edenhill/librdkafka).
 Currently this package builds only on Linux and requires `git` and `make` to
 be available in command line.
 
-```
+```julia
+using Pkg
 Pkg.clone("https://github.com/dfdx/RDKafka.jl")
 Pkg.build("RDKafka")
 ```
@@ -18,14 +19,14 @@ Pkg.build("RDKafka")
 
 Producer:
 
-```
+```julia
 p = KafkaProducer("localhost:9092")
 partition = 0
 produce(p, "mytopic", partition, "message key", "message payload")
 ```
 
 Consumer:
-```
+```julia
 c = KafkaConsumer("localhost:9092", "my-consumer-group")
 parlist = [("mytopic", 0), ("mytopic", 1), ("mytopic", 2)]
 subscribe(c, parlist)
