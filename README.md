@@ -33,6 +33,6 @@ subscribe(c, parlist)
 timeout_ms = 1000
 for i=1:10
     msg = poll(String, String, c, timeout_ms)
-    println(msg)
+    show(msg)
 end
 ```
