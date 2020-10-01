@@ -14,3 +14,4 @@ build.log
 
 # intensionally invisible files
 _*
+Manifest.toml

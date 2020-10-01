@@ -4,15 +4,12 @@ Julia wrapper for [librdkafka](https://github.com/edenhill/librdkafka).
 
 ## Build
 
-Currently this package builds only on Linux and requires `git` and `make` to
-be available in command line.
-
 ```julia
 using Pkg
-Pkg.clone("https://github.com/dfdx/RDKafka.jl")
-Pkg.build("RDKafka")
+Pkg.add("RDKafka")
 ```
 
+Prebuilt binaries of the `librdkafka` native library is downloaded. The binaries are available for all supported Julia platforms. 
 
 ## Usage
 
