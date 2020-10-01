@@ -3,4 +3,7 @@ uuid = "43e2f499-f4c7-585f-8317-cbc2d9c3bf8f"
 
 [deps]
 BinaryProvider = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+librdkafka_jll = "7943bfb0-7437-5acd-a008-22777931c7aa"
+
+[compat]
+julia = "1.3"

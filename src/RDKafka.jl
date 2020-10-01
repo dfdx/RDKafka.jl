@@ -1,4 +1,5 @@
 module RDKafka
+using librdkafka_jll
 
 export KafkaProducer,
     KafkaConsumer,
