@@ -1,6 +1,10 @@
 ## wrapper for librdkafka C API, see:
 ## https://github.com/edenhill/librdkafka/blob/master/src/rdkafka.h
 
+function rd_kafka_version()
+    ccall((:rd_kafka_version, RDKafka.librdkafka), Cint, ())
+end
+
 ## rd_kafka_conf_t
 
 function kafka_conf_new()
@@ -13,7 +17,7 @@ end
 
 
 function kafka_conf_set(conf::Ptr{Cvoid}, key::String, val::String)
-    err_str = Array{UInt8}(undef, 512)
+    err_str = zeros(UInt8, 512)
     return ccall((:rd_kafka_conf_set, librdkafka), Cvoid,
                  (Ptr{Cvoid}, Cstring, Cstring, Ptr{UInt8}, Csize_t),
                  conf, key, val, pointer(err_str), sizeof(err_str))
@@ -21,7 +25,7 @@ end
 
 
 function kafka_conf_get(conf::Ptr{Cvoid}, key::String)
-    dest = Array{UInt8}(undef, 512)
+    dest = zeros(UInt8, 512)
     sz_ref = Ref{Csize_t}(0)
     ccall((:rd_kafka_conf_get, librdkafka), Cvoid,
           (Ptr{Cvoid}, Cstring, Ptr{UInt8}, Ptr{Csize_t}),
@@ -48,7 +52,7 @@ const KAFKA_TYPE_CONSUMER = Cint(1)
 
 
 function kafka_new(conf::Ptr{Cvoid}, kafka_type::Cint)
-    err_str = Array{UInt8}(undef, 512)
+    err_str = zeros(UInt8, 512)
     client = ccall((:rd_kafka_new, librdkafka),
                    Ptr{Cvoid},
                    (Cint, Ptr{Cvoid}, Ptr{UInt8}, Csize_t),
