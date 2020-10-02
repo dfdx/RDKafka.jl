@@ -1,5 +1,7 @@
 name = "RDKafka"
 uuid = "43e2f499-f4c7-585f-8317-cbc2d9c3bf8f"
+authors = ["Andrei Zhabinski <andrei.zhabinski@gmail.com>"]
+version = "0.1.0"
 
 [deps]
 BinaryProvider = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
