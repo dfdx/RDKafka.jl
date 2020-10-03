@@ -13,23 +13,62 @@ Prebuilt binaries of the `librdkafka` native library is downloaded. The binaries
 
 ## Usage
 
+### Start Kafka server
 
-Producer:
+If you don't have one already started, download Kafka server and run it according to the official [QuickStart Guide](https://kafka.apache.org/quickstart). Here's a short versioin of that guide:
 
-```julia
-p = KafkaProducer("localhost:9092")
-partition = 0
-produce(p, "mytopic", partition, "message key", "message payload")
+`cd` to the kafka folder and in run the following commands in 2 different terminals:
+
+```
+# start ZooKeeper server
+bin/zookeeper-server-start.sh config/zookeeper.properties
+# start Kafka broker
+bin/kafka-server-start.sh config/server.properties
 ```
 
-Consumer:
+In yet another terminal create a topic:
+
+```
+# create topic
+bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092
+# describe it
+bin/kafka-topics.sh --describe --topic quickstart-events --bootstrap-server localhost:9092
+```
+
+### Produce and consume some messages
+
+Now in Julia console start polling using `KafkaConsumer`:
+
 ```julia
+using RDKafka
+
 c = KafkaConsumer("localhost:9092", "my-consumer-group")
-parlist = [("mytopic", 0), ("mytopic", 1), ("mytopic", 2)]
+parlist = [("quickstart-events", 0)]
 subscribe(c, parlist)
 timeout_ms = 1000
-for i=1:10
+while true
     msg = poll(String, String, c, timeout_ms)
-    show(msg)
+    @show(msg)
 end
 ```
+
+And procude a few messages using `KafkaProducer`
+
+```julia
+using RDKafka
+import RDKafka.produce
+
+p = KafkaProducer("localhost:9092")
+partition = 0
+produce(p, "quickstart-events", partition, "message key", "message payload")
+```
+
+In the consumer window you should see something like:
+
+```
+msg = nothing
+msg = Message(message key: message payload)
+msg = nothing
+msg = nothing
+```
+where `nothing` means that there were no new messages in that polling interval while `Message(...)` is actual message we sent from producer.
