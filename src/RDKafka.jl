@@ -6,6 +6,7 @@ export KafkaProducer,
     KafkaClient,
     # produce,
     subscribe,
+    seek,
     poll
 
 include("core.jl")
