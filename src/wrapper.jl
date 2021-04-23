@@ -142,32 +142,51 @@ end
 
 
 
-## topic list
+## topic partition list
+
+mutable struct CKafkaTopicPartition
+    topic::Cstring
+    partition::Cint
+    offset::Clonglong
+    metadata::Ptr{Cvoid}
+    metadata_size::Csize_t
+    opaque::Ptr{Cvoid}
+    err::Cint
+    _private::Ptr{Cvoid}
+end
+mutable struct CKafkaTopicPartitionList
+    cnt::Cint
+    size::Cint
+    elems::Ptr{CKafkaTopicPartition}
+end
 
 function kafka_topic_partition_list_new(sz::Integer=0)
-    rkparlist = ccall((:rd_kafka_topic_partition_list_new, librdkafka), Ptr{Cvoid},
+    rkparlist = ccall((:rd_kafka_topic_partition_list_new, librdkafka), Ptr{CKafkaTopicPartitionList},
                        (Cint,), sz)
-    return rkparlist
+    if rkparlist != Ptr{CKafkaTopicPartitionList}(0)
+        return rkparlist
+    end
+    return nothing
 end
 
 
-function kafka_topic_partition_list_destroy(rkparlist::Ptr{Cvoid})
-    ccall((:rd_kafka_topic_partition_list_destroy, librdkafka), Cvoid, (Ptr{Cvoid},), rkparlist)
+function kafka_topic_partition_list_destroy(rkparlist::Ptr{CKafkaTopicPartitionList})
+    ccall((:rd_kafka_topic_partition_list_destroy, librdkafka), Cvoid, (Ptr{CKafkaTopicPartitionList},), rkparlist)
 end
 
 
-function kafka_topic_partition_list_add(rkparlist::Ptr{Cvoid},
+function kafka_topic_partition_list_add(rkparlist::Ptr{CKafkaTopicPartitionList},
                                         topic::String, partition::Integer)
-    ccall((:rd_kafka_topic_partition_list_add, librdkafka), Ptr{Cvoid},
-          (Ptr{Cvoid}, Cstring, Int32,), rkparlist, topic, partition)
+    ccall((:rd_kafka_topic_partition_list_add, librdkafka), Ptr{CKafkaTopicPartition},
+          (Ptr{CKafkaTopicPartitionList}, Cstring, Int32,), rkparlist, topic, partition)
 end
 
 
 ## partition assignment
 
-function kafka_assignment(rk::Ptr{Cvoid}, rkparlist::Ptr{Cvoid})
+function kafka_assignment(rk::Ptr{Cvoid}, rkparlist::Ptr{CKafkaTopicPartitionList})
     errcode = ccall((:rd_kafka_assignment, librdkafka), Cint,
-                    (Ptr{Cvoid}, Ptr{Cvoid}), rk, rkparlist)
+                    (Ptr{Cvoid}, Ref{Ptr{CKafkaTopicPartitionList}}), rk, rkparlist)
     if errcode != 0
         error("Assignment retrieval failed with error $errcode")
     end
@@ -176,11 +195,40 @@ end
 
 ## subscribe
 
-function kafka_subscribe(rk::Ptr{Cvoid}, rkparlist::Ptr{Cvoid})
+function kafka_subscribe(rk::Ptr{Cvoid}, rkparlist::Ptr{CKafkaTopicPartitionList})
     errcode = ccall((:rd_kafka_subscribe, librdkafka), Cint,
                     (Ptr{Cvoid}, Ptr{Cvoid}), rk, rkparlist)
     if errcode != 0
         error("Subscription failed with error $errcode")
+    end
+end
+
+
+## seek
+
+function kafka_offsets_for_times(rk::Ptr{Cvoid}, rkparlist::Ptr{CKafkaTopicPartitionList}, timeout::Integer)
+    errcode = ccall((:rd_kafka_offsets_for_times, librdkafka), Cint,
+                    (Ptr{Cvoid}, Ptr{CKafkaTopicPartitionList}, Cint), rk, rkparlist, timeout)
+    if errcode != 0
+        error("kafka_offsets_for_times failed with error $errcode")
+    end
+end
+
+function kafka_seek(rkt::Ptr{Cvoid}, partition::Int32, offset::Int64, timeout::Int=1000)
+    errcode = ccall((:rd_kafka_seek, librdkafka), Cint,
+                    (Ptr{Cvoid}, Cint, Clonglong, Cint), 
+                    rkt, partition, offset, timeout)
+    if errcode != 0
+        error("kafka_seek failed with error $errcode")
+    end
+end
+
+function kafka_assign(rk::Ptr{Cvoid}, rkparlist::Ptr{CKafkaTopicPartitionList})
+    errcode = ccall((:rd_kafka_assign, librdkafka), Cint,
+                    (Ptr{Cvoid}, Ptr{CKafkaTopicPartitionList}), 
+                    rk, rkparlist)
+    if errcode != 0
+        error("kafka_assign failed with error $errcode")
     end
 end
 
