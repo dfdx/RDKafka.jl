@@ -21,7 +21,7 @@ end
 function KafkaConsumer(conf::Dict; dr_cb=nothing, err_cb=nothing)
     @assert haskey(conf, "bootstrap.servers") "`bootstrap.servers` should be specified in conf"
     @assert haskey(conf, "group.id") "`group.id` should be specified in conf"
-    client = KafkaClient(KAFKA_TYPE_CONSUMER, conf; dr_cb, err_cb)
+    client = KafkaClient(KAFKA_TYPE_CONSUMER, conf; dr_cb=dr_cb, err_cb=err_cb)
     parlist = PartitionList()
     return KafkaConsumer(client, parlist)
 end
@@ -30,7 +30,7 @@ end
 function KafkaConsumer(bootstrap_servers::String, group_id::String, conf::Dict=Dict(); dr_cb=nothing, err_cb=nothing)
     conf["bootstrap.servers"] = bootstrap_servers
     conf["group.id"] = group_id
-    return KafkaConsumer(conf; dr_cb, err_cb)
+    return KafkaConsumer(conf; dr_cb=dr_cb, err_cb=err_cb)
 end
 
 
