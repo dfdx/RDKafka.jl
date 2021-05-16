@@ -4,7 +4,7 @@ using librdkafka_jll
 export KafkaProducer,
     KafkaConsumer,
     KafkaClient,
-    # produce,
+    produce,
     subscribe,
     seek,
     poll

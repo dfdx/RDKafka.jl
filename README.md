@@ -72,3 +72,27 @@ msg = nothing
 msg = nothing
 ```
 where `nothing` means that there were no new messages in that polling interval while `Message(...)` is actual message we sent from producer.
+
+### Error handling
+
+Add the `err_cb` argument to either KafkaConsumer or KafkaProducer.
+
+```
+c = KafkaConsumer("localhost:9092", "my-consumer-group", err_cb=(err::Int, reason::String) -> throw(error(reason)))
+```
+
+### Delivery reports
+
+Add the `dr_cb` argument to a KafkaProducer.
+
+```
+p = KafkaProducer("localhost:9092", dr_cb=msg -> if msg.err != 0 throw(error("Delivery failed") end))
+```
+
+### Seeking
+
+```
+c = KafkaConsumer("localhost:9092", "my-consumer-group")
+RDKafka.seek(c, timestamp_ms, timeout_ms)
+```
+
