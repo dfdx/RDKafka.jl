@@ -20,11 +20,11 @@ RDKafka.kafka_conf_destroy(conf)
 @test true # No exceptions
 
 @testset "Verify error callback is called" begin
-  conf = Dict()
-  conf["bootstrap.servers"] = "bad"
-  ch = Channel(1)
-  RDKafka.KafkaProducer(conf; err_cb=(err, reason) -> begin
-    push!(ch, err)
-  end)
-  @test take!(ch) == -193
+    conf = Dict()
+    conf["bootstrap.servers"] = "bad"
+    ch = Channel(1)
+    RDKafka.KafkaProducer(conf; err_cb=(err, reason) -> begin
+        push!(ch, err)
+    end)
+    @test take!(ch) == -193
 end

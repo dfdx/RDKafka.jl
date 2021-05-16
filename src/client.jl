@@ -47,14 +47,22 @@ function KafkaClient(typ::Integer, conf::Dict=Dict(); dr_cb=nothing, err_cb=noth
     end
     rk = kafka_new(c_conf, Cint(typ))
     client = KafkaClient(conf, typ, rk)
+    polling = dr_cb != nothing || err_cb != nothing
     # seems like `kafka_destroy` also destroys its config, so we don't attempt it twice
-    finalizer(client -> kafka_destroy(rk), client)
+    finalizer(client -> begin 
+        polling = false
+        kafka_destroy(rk)
+    end, client)
     if dr_cb != nothing
         # set Julia callback after rk is created
         DELIVERY_CALLBACKS[rk] = dr_cb
     end
     if err_cb != nothing
         ERROR_CALLBACKS[rk] = err_cb
+    end
+    @async while polling
+        kafka_poll(rk, 1000)
+        sleep(1)
     end
     return client
 end

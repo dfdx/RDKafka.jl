@@ -8,14 +8,6 @@ end
 
 function KafkaProducer(conf::Dict; dr_cb=nothing, err_cb=nothing)
     kc = KafkaClient(KAFKA_TYPE_PRODUCER, conf; dr_cb=dr_cb, err_cb=err_cb)
-    if dr_cb != nothing || err_cb != nothing
-        @async begin
-            while true
-                kafka_poll(kc.rk, 1000)
-                sleep(1)
-            end
-        end
-    end
     return KafkaProducer(kc, Dict())
 end
 

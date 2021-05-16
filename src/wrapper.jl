@@ -201,9 +201,6 @@ function kafka_subscribe(rk::Ptr{Cvoid}, rkparlist::Ptr{CKafkaTopicPartitionList
     if errcode != 0
         error("Subscription failed with error $errcode")
     end
-    # since we use rd_kafka_consumer_poll, redirect the rd_kafka_poll() queue to the consumer queue.
-    ccall((:rd_kafka_poll_set_consumer, librdkafka), Cint,
-        (Ptr{Cvoid},), rk)
 end
 
 
