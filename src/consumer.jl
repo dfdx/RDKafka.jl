@@ -7,7 +7,6 @@ end
 function PartitionList()
     ptr = kafka_topic_partition_list_new()
     parlist = PartitionList(ptr)
-    finalizer(parlist -> kafka_topic_partition_list_destroy(ptr), parlist)
     return parlist
 end
 
@@ -86,5 +85,10 @@ function poll(::Type{K}, ::Type{P}, c::KafkaConsumer, timeout::Int=1000) where {
     end
 end
 
+function Base.close(c::KafkaConsumer)
+    kafka_topic_partition_list_destroy(c.parlist.rkparlist)
+    kafka_consumer_close(c.client.rk)
+    kafka_destroy(c.client.rk)
+end
 
 poll(c::KafkaConsumer, timeout::Int=1000) = poll(Vector{UInt8}, Vector{UInt8}, c, timeout)
