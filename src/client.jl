@@ -21,7 +21,7 @@ function error_callback(rk::Ptr{Cvoid}, err::Cint, reason::Ptr{Cchar}, opaque::P
     @warn "Error callback is not implemented"
 end
 error_callback_c = @cfunction(error_callback, Cvoid, (Ptr{Cvoid}, Cint, Ptr{Cvoid}, Ptr{Cvoid}))
-const ERROR_CALLBACKS = Dict{Ptr, Function}
+const ERROR_CALLBACKS = Dict{Ptr, Function}()
 
 
 
@@ -38,23 +38,20 @@ function KafkaClient(typ::Integer, conf::Dict=Dict(); dr_cb=nothing, err_cb=noth
     for (k, v) in conf
         kafka_conf_set(c_conf, string(k), string(v))
     end
-    if dr_cb != nothing
+    if dr_cb !== nothing
         # set callback in config before creating rk
         kafka_conf_set_dr_msg_cb(c_conf, delivery_callback_c)
     end
-    if err_cb != nothing
+    if err_cb !== nothing
         kafka_conf_set_error_cb(c_conf, error_callback_c)
     end
     rk = kafka_new(c_conf, Cint(typ))
     client = KafkaClient(conf, typ, rk)
-    # seems like `kafka_destroy` also destroys its config, so we don't attempt it twice
-    finalizer(client -> kafka_destroy(rk), client)
-    Timer(t -> kafka_poll(rk, 100), 1; interval=1)
-    if dr_cb != nothing
+    if dr_cb !== nothing
         # set Julia callback after rk is created
         DELIVERY_CALLBACKS[rk] = dr_cb
     end
-    if err_cb != nothing
+    if err_cb !== nothing
         ERROR_CALLBACKS[rk] = err_cb
     end
     return client
@@ -77,8 +74,11 @@ function KafkaTopic(kc::KafkaClient, topic::String, conf::Dict=Dict())
     end
     rkt = kafka_topic_new(kc.rk, topic, c_conf)
     topic = KafkaTopic(conf, topic, rkt)
-    finalizer(topic -> (kafka_topic_destroy(rkt)), topic)
     return topic
+end
+
+function Base.close(topic::KafkaTopic)
+    kafka_topic_destroy(topic.rkt)
 end
 
 Base.show(io::IO, kt::KafkaTopic) = print(io, "KafkaTopic($(kt.topic))")

@@ -66,6 +66,10 @@ function kafka_destroy(rk::Ptr{Cvoid})
 end
 
 
+function kafka_consumer_close(rk::Ptr{Cvoid})
+    ccall((:rd_kafka_consumer_close, librdkafka), Cvoid, (Ptr{Cvoid},), rk)
+end
+
 ## rd_kafka_topic_conf_t
 
 function kafka_topic_conf_new()
