@@ -60,7 +60,7 @@ function KafkaClient(typ::Integer, conf::Dict=Dict(); dr_cb=nothing, err_cb=noth
     if err_cb != nothing
         ERROR_CALLBACKS[rk] = err_cb
     end
-    @async while polling
+    Threads.@spawn while polling
         kafka_poll(rk, 0)
         sleep(1)
     end
