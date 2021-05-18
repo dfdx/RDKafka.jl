@@ -134,7 +134,7 @@ function produce(rkt::Ptr{Cvoid}, partition::Integer,
     if errcode != 0
         #error("Produce request failed with error code (unix): $errcode")
         ## errno is c global var
-	errnr = unsafe_load(cglobal(:errno, Int32))
+    	errnr = unsafe_load(cglobal(:errno, Int32))
         errmsg = unsafe_string(ccall(:strerror, Cstring, (Int32,), errnr))
         error("Produce request failed with error code: $errmsg")  
     end
@@ -261,3 +261,4 @@ end
 function kafka_message_destroy(msg_ptr::Ptr{CKafkaMessage})
     ccall((:rd_kafka_message_destroy, librdkafka), Cvoid, (Ptr{Cvoid},), msg_ptr)
 end
+5

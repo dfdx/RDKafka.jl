@@ -13,16 +13,17 @@ function delivery_callback(rk::Ptr{Cvoid}, rkmessage::Ptr{CKafkaMessage}, opaque
         cb(msg)
     end
 end
-delivery_callback_c = @cfunction(delivery_callback, Cvoid, (Ptr{Cvoid}, Ptr{CKafkaMessage}, Ptr{Cvoid}))
 
 
+# error callbacks are called with the arguments (err::Int, reason::String)
 function error_callback(rk::Ptr{Cvoid}, err::Cint, reason::Ptr{Cchar}, opaque::Ptr{Cvoid})::Cvoid
-    # TODO: implement
-    @warn "Error callback is not implemented"
+    reason = unsafe_string(reason)
+    if haskey(ERROR_CALLBACKS, rk)
+        cb = ERROR_CALLBACKS[rk]
+        cb(err, reason)
+    end
 end
-error_callback_c = @cfunction(error_callback, Cvoid, (Ptr{Cvoid}, Cint, Ptr{Cvoid}, Ptr{Cvoid}))
-const ERROR_CALLBACKS = Dict{Ptr, Function}
-
+const ERROR_CALLBACKS = Dict{Ptr, Function}()
 
 
 mutable struct KafkaClient
@@ -33,29 +34,35 @@ end
 
 
 function KafkaClient(typ::Integer, conf::Dict=Dict(); dr_cb=nothing, err_cb=nothing)
-    # TODO: add options for callbacks, creata a task calling kafka_poll(rk, timeout) every 1 second
     c_conf = kafka_conf_new()
     for (k, v) in conf
         kafka_conf_set(c_conf, string(k), string(v))
     end
+    # set callbacks in config before creating rk
     if dr_cb != nothing
-        # set callback in config before creating rk
-        kafka_conf_set_dr_msg_cb(c_conf, delivery_callback_c)
+        kafka_conf_set_dr_msg_cb(c_conf, @cfunction(delivery_callback, Cvoid, (Ptr{Cvoid}, Ptr{CKafkaMessage}, Ptr{Cvoid})))
     end
     if err_cb != nothing
-        kafka_conf_set_error_cb(c_conf, error_callback_c)
+        kafka_conf_set_error_cb(c_conf, @cfunction(error_callback, Cvoid, (Ptr{Cvoid}, Cint, Ptr{Cchar}, Ptr{Cvoid})))
     end
     rk = kafka_new(c_conf, Cint(typ))
     client = KafkaClient(conf, typ, rk)
+    polling = dr_cb != nothing || err_cb != nothing
     # seems like `kafka_destroy` also destroys its config, so we don't attempt it twice
-    finalizer(client -> kafka_destroy(rk), client)
-    Timer(t -> kafka_poll(rk, 100), 1; interval=1)
+    finalizer(client -> begin 
+        polling = false
+        kafka_destroy(rk)
+    end, client)
     if dr_cb != nothing
         # set Julia callback after rk is created
         DELIVERY_CALLBACKS[rk] = dr_cb
     end
     if err_cb != nothing
         ERROR_CALLBACKS[rk] = err_cb
+    end
+    @async while polling
+        kafka_poll(rk, 0)
+        sleep(1)
     end
     return client
 end
