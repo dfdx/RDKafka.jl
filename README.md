@@ -73,6 +73,15 @@ msg = nothing
 ```
 where `nothing` means that there were no new messages in that polling interval while `Message(...)` is actual message we sent from producer.
 
+### Configuration
+
+`librdkafka` is highly customizable, see [CONFIGURATION.md](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md) for the list of supported properties. To set a particular property, pass a `conf` object to `KafkaProducer` or `KafkaConsumer`, e.g.:
+
+```julia
+conf = Dict("socket.timeout.ms" => 300000)
+p = KafkaProducer("localhost:9092", conf)
+```
+
 ### Error handling
 
 Add the `err_cb` argument to either KafkaConsumer or KafkaProducer.
