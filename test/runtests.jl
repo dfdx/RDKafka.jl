@@ -1,15 +1,13 @@
 using RDKafka
 using Test
 
-a = RDKafka.rd_kafka_version() # 0x010802ff for 1.8.2
+a = RDKafka.rd_kafka_version() # 0x020002ff for 2.0.2
 # verify the major and minor. Any change to these should be reflected
 # by a change in Project.toml
-@test (a & 0x01000000) == 0x01000000
-@test (a & 0x00080000) == 0x00080000
-@test (a & 0x00000200) == 0x00000200
+@test (a & 0xff000000) == 0x02000000
+@test (a & 0x00ff0000) == 0x00000000
 
-
-conf =  RDKafka.kafka_conf_new()
+conf = RDKafka.kafka_conf_new()
 @test RDKafka.kafka_conf_get(conf, "socket.keepalive.enable") == "false"
 RDKafka.kafka_conf_set(conf, "socket.keepalive.enable", "true")
 @test RDKafka.kafka_conf_get(conf, "socket.keepalive.enable") == "true"
