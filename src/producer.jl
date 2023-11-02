@@ -23,6 +23,20 @@ function Base.show(io::IO, p::KafkaProducer)
 end
 
 
+function produce(kt::KafkaTopic, partition::Integer, key, payload::Integer)
+    # Converting an Integer type to a Vector{UInt8} needs to be done through reinterpret
+    # Additionally, convert from host endianness to network endianness
+    produce(kt, partition, key, reinterpret(UInt8, [hton(payload)]))
+end
+
+
+function produce(kt::KafkaTopic, partition::Integer, key::Integer, payload)
+    # Converting an Integer type to a Vector{UInt8} needs to be done through reinterpret
+    # Additionally, convert from host endianness to network endianness
+    produce(kt, partition, reinterpret(UInt8, [hton(key)]), payload)
+end
+
+
 function produce(kt::KafkaTopic, partition::Integer, key, payload)
     # produce(kt.rkt, partition, convert(Vector{UInt8}, key), convert(Vector{UInt8}, payload))
     produce(kt.rkt, partition, Vector{UInt8}(key), Vector{UInt8}(payload))
