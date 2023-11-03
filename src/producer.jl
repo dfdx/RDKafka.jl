@@ -25,7 +25,7 @@ end
 
 function produce(kt::KafkaTopic, partition::Integer, key, payload)
     # produce(kt.rkt, partition, convert(Vector{UInt8}, key), convert(Vector{UInt8}, payload))
-    produce(kt.rkt, partition, Vector{UInt8}(key), Vector{UInt8}(payload))
+    produce(kt.rkt, partition, _tobytestream(key), _tobytestream(payload))
 end
 
 
