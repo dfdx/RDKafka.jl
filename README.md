@@ -15,7 +15,7 @@ Prebuilt binaries of the `librdkafka` native library is downloaded. The binaries
 
 ### Start Kafka server
 
-If you don't have one already started, download Kafka server and run it according to the official [QuickStart Guide](https://kafka.apache.org/quickstart). Here's a short versioin of that guide:
+If you don't have one already started, download Kafka server and run it according to the official [QuickStart Guide](https://kafka.apache.org/quickstart). Here's a short version of that guide:
 
 `cd` to the kafka folder and in run the following commands in 2 different terminals:
 
@@ -52,7 +52,7 @@ while true
 end
 ```
 
-And procude a few messages using `KafkaProducer`
+And produce a few messages using `KafkaProducer`
 
 ```julia
 using RDKafka
@@ -104,4 +104,3 @@ p = KafkaProducer("localhost:9092", dr_cb=msg -> if msg.err != 0 throw(error("De
 c = KafkaConsumer("localhost:9092", "my-consumer-group")
 RDKafka.seek(c, timestamp_ms, timeout_ms)
 ```
-
