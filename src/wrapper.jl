@@ -117,16 +117,29 @@ function kafka_poll(rk::Ptr{Cvoid}, timeout::Integer)
     
 end
 
+# Produce message flags
+# NOTE: RD_KAFKA_MSG_F_FREE and RD_KAFKA_MSG_F_COPY are mutually exclusive
+#
+const RD_KAFKA_MSG_F_FREE = Cint(1)
+const RD_KAFKA_MSG_F_COPY = Cint(2)
+const RD_KAFKA_MSG_F_BLOCK = Cint(4)
+const RD_KAFKA_MSG_F_PARTITION = Cint(8)
+
 
 function produce(rkt::Ptr{Cvoid}, partition::Integer,
-                 key::Vector{UInt8}, payload::Vector{UInt8})
-    flags = Cint(0)
+    key::Vector{UInt8}, payload::Vector{UInt8})
+    produce(rkt, partition, key, payload, [])
+end
+
+
+function produce(rkt::Ptr{Cvoid}, partition::Integer,
+                 key::Vector{UInt8}, payload::Vector{UInt8}, flags::Vector{Cint})
     errcode = ccall((:rd_kafka_produce, librdkafka), Cint,
                     (Ptr{Cvoid}, Int32, Cint,
                      Ptr{Cvoid}, Csize_t,
                      Ptr{Cvoid}, Csize_t,
                      Ptr{Cvoid}),
-                    rkt, Int32(partition), flags,
+                    rkt, Int32(partition), reduce(|, flags, init=Cint(0)),
                     pointer(payload), length(payload),
                     pointer(key), length(key),
                     C_NULL)   
@@ -261,4 +274,3 @@ end
 function kafka_message_destroy(msg_ptr::Ptr{CKafkaMessage})
     ccall((:rd_kafka_message_destroy, librdkafka), Cvoid, (Ptr{Cvoid},), msg_ptr)
 end
-5
