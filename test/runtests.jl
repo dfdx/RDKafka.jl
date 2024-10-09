@@ -27,3 +27,6 @@ RDKafka.kafka_conf_destroy(conf)
     end)
     @test take!(ch) == -193
 end
+
+
+include("test_consumer.jl")
