@@ -1,0 +1,24 @@
+
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  build:
+    name: Test in Docker
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: docker/build-push-action@v6
+        with:
+          tags: rdkafka-jl:latest
+          push: false
+      - uses: addnab/docker-run-action@v3
+        with:
+          image: rdkafka-jl:latest
+          run: sh /opt/RDKafka.jl/scripts/run-tests.sh
