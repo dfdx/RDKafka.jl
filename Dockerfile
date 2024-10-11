@@ -130,4 +130,4 @@ USER ${user}
 
 ## Launch
 
-ENTRYPOINT ["${RDKAFKA_TEST_DIR}/scripts/run-tests.sh"]
+ENTRYPOINT ["/opt/RDKafka.jl/scripts/run-tests.sh"]
