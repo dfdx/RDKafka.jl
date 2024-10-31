@@ -11,7 +11,7 @@ end
 # Internal method to convert a key/payload to a bytestream for Kafka
 # Numeric types can be represented as a byte stream using hton and reinterpret.
 # We will need to do the opposite on the consumer side to convert bac
-_tobytestream(o::Number) = reinterpret(UInt8, [hton(payload)])
+_tobytestream(o::Number) = reinterpret(UInt8, [hton(o)])
 _tobytestream(o::Vector{UInt8}) = o
 _tobytestream(o::AbstractString) = Vector{UInt8}(o)
 _tobytestream(::Nothing) = [UInt8(0)]
