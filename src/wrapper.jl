@@ -245,6 +245,13 @@ function kafka_assign(rk::Ptr{Cvoid}, rkparlist::Ptr{CKafkaTopicPartitionList})
     end
 end
 
+function kafka_topic_name(rkt::Ptr{Cvoid})
+    str_ptr = ccall((:rd_kafka_topic_name, librdkafka), Cstring,
+        (Ptr{Cvoid},),
+        rkt
+    )
+    unsafe_string(str_ptr)
+end
 
 struct CKafkaMessage
     err::Cint
