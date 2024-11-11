@@ -128,7 +128,7 @@ const RD_KAFKA_MSG_F_PARTITION = Cint(8)
 
 function produce(rkt::Ptr{Cvoid}, partition::Integer,
     key::Vector{UInt8}, payload::Vector{UInt8})
-    produce(rkt, partition, key, payload, [])
+    produce(rkt, partition, key, payload, Vector{Cint}())
 end
 
 
