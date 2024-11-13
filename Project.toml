@@ -1,7 +1,7 @@
 name = "RDKafka"
 uuid = "43e2f499-f4c7-585f-8317-cbc2d9c3bf8f"
 authors = ["Andrei Zhabinski <andrei.zhabinski@gmail.com>"]
-version = "0.2.3"
+version = "0.2.4"
 
 [deps]
 librdkafka_jll = "7943bfb0-7437-5acd-a008-22777931c7aa"
