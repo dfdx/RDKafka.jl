@@ -103,13 +103,14 @@ end
 Base.convert(::Type{String}, data::Vector{UInt8}) = String(data)
 
 function Message{K,P}(c_msg::CKafkaMessage) where {K,P}
-    topic_name = kafka_topic_name(c_msg.rkt)
-    topic = KafkaTopic(Dict(), topic_name, c_msg.rkt)
     if c_msg.err == 0
+        topic_name = kafka_topic_name(c_msg.rkt)
+        topic = KafkaTopic(Dict(), topic_name, c_msg.rkt)
         key = _frombytestream(K, unsafe_load_array(c_msg.key, c_msg.key_len))
         payload = _frombytestream(P, unsafe_load_array(c_msg.payload, c_msg.len))
         return Message(Int(c_msg.err), topic, c_msg.partition, key, payload, c_msg.offset)
     else
+        topic = KafkaTopic(Dict(), "<unknown>", c_msg.rkt)
         return Message{K,P}(Int(c_msg.err), topic, c_msg.partition, nothing, nothing, c_msg.offset)
     end
 end
